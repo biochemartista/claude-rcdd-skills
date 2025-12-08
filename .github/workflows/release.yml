@@ -1,0 +1,157 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude-plugin/marketplace.json'
+      - 'plugin.json'
+      - 'CLAUDE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          jq empty .claude-plugin/marketplace.json || exit 1
+          jq empty plugin.json || exit 1
+          jq empty hooks.json || exit 1
+          echo "✅ All JSON files valid"
+
+      - name: Extract and validate versions
+        id: get_version
+        run: |
+          MARKETPLACE_VER=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          PLUGIN_VER=$(jq -r '.version' plugin.json)
+
+          echo "marketplace.json version: $MARKETPLACE_VER"
+          echo "plugin.json version: $PLUGIN_VER"
+
+          if [ "$MARKETPLACE_VER" != "$PLUGIN_VER" ]; then
+            echo "::error::Version mismatch! marketplace.json=$MARKETPLACE_VER, plugin.json=$PLUGIN_VER"
+            exit 1
+          fi
+
+          echo "version=$MARKETPLACE_VER" >> $GITHUB_OUTPUT
+          echo "tag=v$MARKETPLACE_VER" >> $GITHUB_OUTPUT
+          echo "✅ Versions match: $MARKETPLACE_VER"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.get_version.outputs.version }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.get_version.outputs.version }} does not exist"
+          fi
+
+      - name: Get previous tag
+        id: previous_tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "previous_tag=" >> $GITHUB_OUTPUT
+            echo "No previous tag found"
+          else
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+            echo "Previous tag: $PREVIOUS_TAG"
+          fi
+
+      - name: Generate release notes
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          PREVIOUS_TAG="${{ steps.previous_tag.outputs.previous_tag }}"
+          SKILLS=$(jq '.skills.count' plugin.json)
+          AGENTS=$(jq '.agents.count' plugin.json)
+
+          cat > release_notes.md << 'EOF'
+          ## RCDD Multi-Agent System
+
+          EOF
+
+          echo "**${AGENTS} specialized agents | ${SKILLS} scientific skills**" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### What's Changed" >> release_notes.md
+          echo "" >> release_notes.md
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "Changes since ${PREVIOUS_TAG}:" >> release_notes.md
+            echo "" >> release_notes.md
+            git log ${PREVIOUS_TAG}..HEAD --pretty=format:"* %s (%h)" --no-merges >> release_notes.md
+          else
+            echo "Initial release of RCDD Multi-Agent System" >> release_notes.md
+            echo "" >> release_notes.md
+            echo "This release includes:" >> release_notes.md
+            git log --pretty=format:"* %s (%h)" --no-merges --max-count=20 >> release_notes.md
+          fi
+
+          cat >> release_notes.md << 'EOF'
+
+          ---
+
+          ### Installation
+
+          ```bash
+          /plugin marketplace add biochemartista/claude-rcdd-skills
+          /plugin install scientific-skills@claude-rcdd-skills
+          ```
+
+          See [README](https://github.com/biochemartista/claude-rcdd-skills#readme) for full documentation.
+          EOF
+
+          echo "Generated release notes:"
+          cat release_notes.md
+
+      - name: Create release archive
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          zip -r rcdd-skills-${VERSION}.zip \
+            scientific-skills/ \
+            agents/ \
+            .claude/ \
+            .claude-plugin/ \
+            CLAUDE.md \
+            plugin.json \
+            hooks.json \
+            hooks.ps1.json \
+            WORKFLOWS_AND_BEST_PRACTICES.md \
+            README.md \
+            LICENSE.md \
+            -x "*.git*"
+          echo "Created archive: rcdd-skills-${VERSION}.zip"
+
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: RCDD v${{ steps.get_version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          files: rcdd-skills-${{ steps.get_version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip release creation
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "Release v${{ steps.get_version.outputs.version }} already exists. Skipping release creation."

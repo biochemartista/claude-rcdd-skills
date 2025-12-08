@@ -1,0 +1,19 @@
+.claude
+.DS_Store
+
+temp/
+
+pyproject.toml
+uv.lock
+
+.venv/
+.python-version
+main.py
+
+__pycache__/
+
+# API keys and secrets
+.env
+.env.*
+*.env
+rcdd-config.ps1

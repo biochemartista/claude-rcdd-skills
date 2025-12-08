@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"$input = $input | Out-String; $json = $input | ConvertFrom-Json -ErrorAction SilentlyContinue; if ($json.tool_input.command -match 'pubmed|chembl|drugbank|hmdb|pubchem|uniprot|pdb|opentargets|reactome|string|zinc') { Write-Host '🔬 [RCDD] Database query detected' -ForegroundColor Cyan }; Write-Output $input\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"$input = $input | Out-String; $json = $input | ConvertFrom-Json -ErrorAction SilentlyContinue; $output = $json.tool_output; if ($output -match 'PMID|DOI|ChEMBL|HMDB\\d') { Write-Host '📚 [RCDD] References detected in output' -ForegroundColor Green }\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"Write-Host '🧬 RCDD Context Preservation Guide' -ForegroundColor Magenta; Write-Host '═══════════════════════════════════'; Write-Host ''; Write-Host '📋 CRITICAL - Document before compacting:' -ForegroundColor Yellow; Write-Host ''; Write-Host '1. ACTIVE AGENT STATE'; Write-Host '   • Current agent chain stage'; Write-Host '   • Pending agent handoffs'; Write-Host '   • @orchestrator phase (if DEEP mode)'; Write-Host ''; Write-Host '2. RESEARCH CONTEXT'; Write-Host '   • Target/compound under investigation'; Write-Host '   • Key PMIDs and DOIs collected'; Write-Host '   • Hypothesis being tested'; Write-Host '   • Evidence strength assessment'; Write-Host ''; Write-Host '3. DATABASE RESULTS'; Write-Host '   • ChEMBL compound IDs'; Write-Host '   • UniProt accessions'; Write-Host '   • PDB structure codes'; Write-Host '   • HMDB metabolite IDs'; Write-Host ''; Write-Host '4. DOCUMENT STATE (if writing)'; Write-Host '   • Section being drafted'; Write-Host '   • Citation queue for @validator'; Write-Host '   • Figure specifications'; Write-Host ''; Write-Host '📖 Reference: CLAUDE.md for agent routing' -ForegroundColor Cyan; Write-Host '📖 Reference: WORKFLOWS_AND_BEST_PRACTICES.md' -ForegroundColor Cyan; Write-Host ''; Write-Host '⚡ Agent Chains to preserve:' -ForegroundColor Yellow; Write-Host '   Literature → @literature-reviewer → @scientific-writer → @validator'; Write-Host '   Drug eval  → @literature-reviewer → @medicinal-chemist'; Write-Host '   Natural    → @literature-reviewer (NATURAL_COMPOUND) → @medicinal-chemist (HMDB)'; Write-Host '   Target     → @target-evaluator + @literature-reviewer'; Write-Host ''; Write-Host '✅ Ready for compact' -ForegroundColor Green\""
+          }
+        ]
+      },
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"Write-Host '🧬 [Auto-Compact] RCDD Context Window Full' -ForegroundColor Magenta; Write-Host ''; Write-Host '⚠️  PRESERVE BEFORE COMPACTING:' -ForegroundColor Yellow; Write-Host '   • Active agent and chain position'; Write-Host '   • Compound/target identifiers'; Write-Host '   • Collected PMIDs/DOIs'; Write-Host '   • Current complexity mode (DIRECT/QUICK/STANDARD/DEEP)'; Write-Host '   • Pending @validator citations'; Write-Host ''; Write-Host '📖 Reload: CLAUDE.md for routing logic' -ForegroundColor Cyan; Write-Host '✅ Auto-compact proceeding' -ForegroundColor Green\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"Write-Host '🧬 RCDD Session Summary' -ForegroundColor Magenta; Write-Host '══════════════════════'; Write-Host ('Session ended: ' + (Get-Date)); Write-Host ''; Write-Host '📊 To resume research:' -ForegroundColor Yellow; Write-Host '   1. State the target/compound of interest'; Write-Host '   2. Mention any PMIDs/ChEMBL IDs to continue from'; Write-Host '   3. Specify which agent chain to resume'; Write-Host ''; Write-Host '💡 Quick resume patterns:' -ForegroundColor Cyan; Write-Host '   \\\"Continue literature review on [target]...\\\"'; Write-Host '   \\\"Resume medicinal chemistry analysis of [compound]...\\\"'; Write-Host '   \\\"Validate the citations from our [document]...\\\"'; Write-Host ''; Write-Host '✅ Session complete' -ForegroundColor Green\""
+          }
+        ]
+      }
+    ]
+  }
+}

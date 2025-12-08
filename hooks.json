@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash -c 'INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r \".tool_input.command // empty\"); if echo \"$CMD\" | grep -qiE \"pubmed|chembl|drugbank|hmdb|pubchem|uniprot|pdb|opentargets|reactome|string|zinc\"; then echo \"🔬 [RCDD] Database query detected\" >&2; fi; echo \"$INPUT\"'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash -c 'INPUT=$(cat); OUTPUT=$(echo \"$INPUT\" | jq -r \".tool_output // empty\" | head -c 500); if echo \"$OUTPUT\" | grep -qiE \"PMID|DOI|ChEMBL|HMDB[0-9]\"; then echo \"📚 [RCDD] References detected in output\" >&2; fi'"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash -c 'echo \"🧬 RCDD Context Preservation Guide\"; echo \"═══════════════════════════════════\"; echo \"\"; echo \"📋 CRITICAL - Document before compacting:\"; echo \"\"; echo \"1. ACTIVE AGENT STATE\"; echo \"   • Current agent chain stage\"; echo \"   • Pending agent handoffs\"; echo \"   • @orchestrator phase (if DEEP mode)\"; echo \"\"; echo \"2. RESEARCH CONTEXT\"; echo \"   • Target/compound under investigation\"; echo \"   • Key PMIDs and DOIs collected\"; echo \"   • Hypothesis being tested\"; echo \"   • Evidence strength assessment\"; echo \"\"; echo \"3. DATABASE RESULTS\"; echo \"   • ChEMBL compound IDs\"; echo \"   • UniProt accessions\"; echo \"   • PDB structure codes\"; echo \"   • HMDB metabolite IDs\"; echo \"\"; echo \"4. DOCUMENT STATE (if writing)\"; echo \"   • Section being drafted\"; echo \"   • Citation queue for @validator\"; echo \"   • Figure specifications\"; echo \"\"; echo \"📖 Reference: CLAUDE.md for agent routing\"; echo \"📖 Reference: WORKFLOWS_AND_BEST_PRACTICES.md\"; echo \"\"; echo \"⚡ Agent Chains to preserve:\"; echo \"   Literature → @literature-reviewer → @scientific-writer → @validator\"; echo \"   Drug eval  → @literature-reviewer → @medicinal-chemist\"; echo \"   Natural    → @literature-reviewer (NATURAL_COMPOUND) → @medicinal-chemist (HMDB)\"; echo \"   Target     → @target-evaluator + @literature-reviewer\"; echo \"\"; echo \"✅ Ready for compact\"'"
+          }
+        ]
+      },
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash -c 'echo \"🧬 [Auto-Compact] RCDD Context Window Full\"; echo \"\"; echo \"⚠️  PRESERVE BEFORE COMPACTING:\"; echo \"   • Active agent and chain position\"; echo \"   • Compound/target identifiers\"; echo \"   • Collected PMIDs/DOIs\"; echo \"   • Current complexity mode (DIRECT/QUICK/STANDARD/DEEP)\"; echo \"   • Pending @validator citations\"; echo \"\"; echo \"📖 Reload: CLAUDE.md for routing logic\"; echo \"✅ Auto-compact proceeding\"'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash -c 'echo \"🧬 RCDD Session Summary\"; echo \"══════════════════════\"; echo \"Session ended: $(date)\"; echo \"\"; echo \"📊 To resume research:\"; echo \"   1. State the target/compound of interest\"; echo \"   2. Mention any PMIDs/ChEMBL IDs to continue from\"; echo \"   3. Specify which agent chain to resume\"; echo \"\"; echo \"💡 Quick resume patterns:\"; echo \"   \\\"Continue literature review on [target]...\\\"\"; echo \"   \\\"Resume medicinal chemistry analysis of [compound]...\\\"\"; echo \"   \\\"Validate the citations from our [document]...\\\"\"; echo \"\"; echo \"✅ Session complete\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

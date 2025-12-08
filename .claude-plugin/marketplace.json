@@ -1,0 +1,46 @@
+{
+  "name": "claude-rcdd-skills",
+  "owner": {
+    "name": "biochemartista",
+    "email": "antonio.lelas@gmail.com"
+  },
+  "metadata": {
+    "description": "Research & Computational Drug Development multi-agent system with 22 scientific skills and 6 specialized agents",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "scientific-skills",
+      "description": "Complete RCDD system with scientific skills, specialized agents, and orchestrator",
+      "version": "1.2.0",
+      "source": "./",
+      "strict": false,
+      "category": "scientific-research",
+      "keywords": ["drug-discovery", "computational-chemistry", "bioinformatics", "research", "multi-agent", "medicinal-chemistry", "natural-products"],
+      "skills": [
+        "./scientific-skills/biopython",
+        "./scientific-skills/chembl-database",
+        "./scientific-skills/drugbank-database",
+        "./scientific-skills/hmdb-database",
+        "./scientific-skills/hypothesis-generation",
+        "./scientific-skills/literature-review",
+        "./scientific-skills/matplotlib",
+        "./scientific-skills/medchem",
+        "./scientific-skills/opentargets-database",
+        "./scientific-skills/pdb-database",
+        "./scientific-skills/perplexity-search",
+        "./scientific-skills/pubchem-database",
+        "./scientific-skills/pubmed-database",
+        "./scientific-skills/rdkit",
+        "./scientific-skills/reactome-database",
+        "./scientific-skills/scientific-brainstorming",
+        "./scientific-skills/scientific-critical-thinking",
+        "./scientific-skills/scientific-visualization",
+        "./scientific-skills/scientific-writing",
+        "./scientific-skills/string-database",
+        "./scientific-skills/uniprot-database",
+        "./scientific-skills/zinc-database"
+      ]
+    }
+  ]
+}
