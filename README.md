@@ -7,9 +7,9 @@ A comprehensive skill marketplace and agent framework for drug discovery researc
 ## Overview
 
 This repository provides:
-- **Skills** - Modular knowledge packages for scientific databases, tools, and methodologies (22 skills)
-- **Agents** - Specialized AI personas for different aspects of drug discovery (6 agents)
-- **Orchestration** - A master orchestrator that coordinates the entire system
+- **Skills** - Modular knowledge packages for scientific databases, tools, and methodologies (23 skills)
+- **Agents** - Specialized AI personas for different aspects of drug discovery (5 agents)
+- **Root Coordination** - Root Claude handles all agent coordination via Task tool with file checkpoints
 
 ## Installation
 
@@ -66,7 +66,7 @@ See [CLAUDE_CODE_INSTALL.md](CLAUDE_CODE_INSTALL.md) for detailed installation i
 
 ## What's Included
 
-### 22 Scientific Skills
+### 23 Scientific Skills
 
 Skills are automatically activated based on your query context:
 
@@ -77,83 +77,79 @@ Skills are automatically activated based on your query context:
 | **Structural** | pdb-database, uniprot-database |
 | **Pathways** | reactome-database, string-database, opentargets-database |
 | **Cheminformatics** | rdkit, medchem, biopython |
-| **Visualization** | matplotlib |
-| **Methodology** | scientific-writing, scientific-critical-thinking, scientific-brainstorming, scientific-visualization, hypothesis-generation |
+| **Visualization** | matplotlib, scientific-visualization |
+| **Methodology** | scientific-writing, scientific-critical-thinking, scientific-brainstorming, hypothesis-generation |
+| **Cognitive (Root-only)** | strategic-thinking |
 
-### 6 Specialized Agents
+### 5 Specialized Agents
 
 Access via `@agent-name`:
 
 | Agent | Model | Role |
 |-------|-------|------|
-| **@orchestrator** | opus + thinking | Chief Scientific Architect |
 | @literature-reviewer | opus | Literature search & synthesis |
 | @medicinal-chemist | opus + thinking | Drug design, SAR, cheminformatics, pathway analysis |
 | @target-evaluator | sonnet | Target validation, structural biology, sequence analysis |
 | @scientific-writer | opus + thinking | Document preparation, figure generation |
 | @validator | sonnet | Citation verification, research quality assessment |
 
+> **Note:** Root Claude coordinates all agents. Agents execute tasks and write outputs to files. No agent spawns other agents.
+
 ---
 
 ## How to Use
 
-Once installed, invoke the **orchestrator agent** to automatically route your query to the appropriate specialist agent(s):
-
-```
-@scientific-skills:orchestrator [your query]
-```
-
-The orchestrator will:
+Once installed, simply ask your question. Root Claude will:
 1. Classify query complexity (DIRECT/QUICK/STANDARD/DEEP)
 2. Route to appropriate specialist agents based on keywords
-3. Coordinate multi-agent workflows when needed
+3. Coordinate multi-agent workflows with file checkpoints
 4. Return results with validated citations
 
-**For simple inquiries**, the orchestrator can answer directly using:
-- `perplexity-search` - AI-powered web search with reasoning
-- `pubmed-database` - PubMed literature access
-- `pubchem-database` - Compound lookup
+### Complexity Modes
 
-**For complex research**, it delegates to specialist agents who use their full skill sets.
+| Mode | Use Case | What Happens |
+|------|----------|--------------|
+| **DIRECT** | Simple factual questions | Claude answers directly using skills, no agents |
+| **QUICK** | Focused questions | Single agent spawned, output verified |
+| **STANDARD** | Multi-step research | Agent chain with checkpoints |
+| **DEEP** | Complex investigations | `strategic-thinking` skill loaded first, then full chain |
 
-### Quick Reference: Common Queries
+### Quick Reference: Natural Language Triggers
 
-| Query Type | Example Command |
-|------------|----------------|
-| **Literature search** | `@scientific-skills:orchestrator find literature on AMPK pathway activation` |
-| **Compound evaluation** | `@scientific-skills:orchestrator evaluate maslinic acid as a drug candidate` |
-| **Target assessment** | `@scientific-skills:orchestrator is BRAF a good drug target?` |
-| **SAR analysis** | `@scientific-skills:orchestrator analyze SAR for these SMILES: [compounds]` |
-| **Mechanism of action** | `@scientific-skills:orchestrator what is the MOA of metformin?` |
-| **Simple questions** | `@scientific-skills:orchestrator does vitamin C affect immunity?` |
-| **Document writing** | `@scientific-skills:orchestrator write a review on honokiol for cancer` |
+| You say... | Routes to |
+|------------|-----------|
+| "What's known about X?" / "Find papers on..." | @literature-reviewer |
+| "Analyze this compound" / "Check druglikeness" | @medicinal-chemist |
+| "Is X a good target?" / "Druggability of..." | @target-evaluator |
+| "Write a report on..." / "Draft a summary" | @literature-reviewer → @scientific-writer → @validator |
+| "Check these citations" / "Verify PMIDs" | @validator |
+| "Deep dive into..." / "Comprehensive analysis" | DEEP mode (full chain) |
 
-### Direct Agent Access (Advanced)
+### Direct Agent Access
 
-You can also invoke specific agents directly when you know exactly which specialist you need:
+You can invoke specific agents directly:
 
 ```
 @scientific-skills:literature-reviewer find recent papers on CRISPR
 @scientific-skills:medicinal-chemist assess druglikeness of compound X
-@scientific-skills:medicinal-chemist calculate properties for this SMILES
 @scientific-skills:target-evaluator evaluate BRAF as a drug target
+@scientific-skills:scientific-writer draft a methods section
+@scientific-skills:validator verify the citations in my document
 ```
 
-### Automatic Agent Routing
+### Agent Chains
 
-The orchestrator uses keyword triggers to route queries:
+Root Claude coordinates mandatory agent chains:
 
-| Keywords | Routed To |
-|----------|-----------|
-| "literature", "papers", "studies", "what is known" | @literature-reviewer |
-| "compound", "SAR", "ADMET", "druglikeness", "IC50" | @medicinal-chemist |
-| "pathway", "MOA", "Reactome", "STRING", "AMPK", "mTOR" | @medicinal-chemist |
-| "SMILES", "fingerprint", "RDKit", "properties" | @medicinal-chemist |
-| "target", "druggability", "GWAS", "Open Targets" | @target-evaluator |
-| "structure", "PDB", "binding site", "sequence" | @target-evaluator |
-| "write report", "manuscript", "document", "figures" | @scientific-writer |
+| Task | Chain |
+|------|-------|
+| Document with references | @literature-reviewer → @scientific-writer → @validator |
+| Drug candidate evaluation | @literature-reviewer → @medicinal-chemist |
+| Natural product assessment | @literature-reviewer → @medicinal-chemist (with HMDB) |
+| Target validation | @target-evaluator → @literature-reviewer |
+| Comprehensive discovery | @literature-reviewer → @target-evaluator → @medicinal-chemist → @scientific-writer → @validator |
 
-> **Note:** The orchestrator handles multi-agent workflows automatically. For example, "evaluate compound X" will route through literature-reviewer → medicinal-chemist. The @medicinal-chemist agent now handles property calculations, pathway context, and cheminformatics internally.
+Each step writes outputs to `.claude/outputs/[date]-[task]/` directories. Root Claude verifies files exist before proceeding to next agent.
 
 ---
 
@@ -163,22 +159,25 @@ The orchestrator uses keyword triggers to route queries:
 claude-rcdd-skills/
 ├── .claude-plugin/
 │   └── marketplace.json          # Plugin manifest for Claude Code
-├── scientific-skills/             # 22 skill modules
+├── .claude/
+│   ├── schemas/                  # Inter-agent data formats
+│   ├── skill-dependencies.md     # Skill loading order
+│   └── outputs/                  # Agent output directories (created at runtime)
+├── scientific-skills/             # 23 skill modules
 │   ├── perplexity-search/
 │   ├── pubmed-database/
+│   ├── strategic-thinking/       # Root-only cognitive frameworks
 │   ├── rdkit/
 │   └── ...
-├── agents/                        # 6 agent definitions (auto-discovered by plugin)
+├── agents/                        # 5 agent definitions (auto-discovered by plugin)
 │   ├── literature-reviewer.md
 │   ├── medicinal-chemist.md
-│   ├── orchestrator.md
 │   ├── target-evaluator.md
 │   ├── scientific-writer.md
 │   └── validator.md
 ├── docs/                          # Additional documentation
-├── CLAUDE.md                      # Project context for main orchestrator
+├── CLAUDE.md                      # Agent routing guide (v1.3.0)
 ├── README.md                      # This file
-├── CLAUDE_CODE_INSTALL.md         # Detailed installation guide
 ├── WORKFLOWS_AND_BEST_PRACTICES.md # Usage workflows
 └── LICENSE.md                     # MIT License
 ```
@@ -210,9 +209,9 @@ Claude: [Literature reviewer agent coordinates with relevant skills]
 ```
 You: Evaluate maslinic acid as a drug candidate
 
-Claude: [Main orchestrator coordinates multiple agents:
-         @literature-reviewer → @medicinal-chemist → @target-evaluator
-         Each uses appropriate skills automatically]
+Claude: [Root Claude coordinates agent chain with checkpoints:
+         @literature-reviewer → @medicinal-chemist
+         Each agent writes output files, verified before next step]
 ```
 
 ### Direct Mode (Simple Questions)

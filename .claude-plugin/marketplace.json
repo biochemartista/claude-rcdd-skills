@@ -5,14 +5,14 @@
     "email": "antonio.lelas@gmail.com"
   },
   "metadata": {
-    "description": "Research & Computational Drug Development multi-agent system with 22 scientific skills and 6 specialized agents",
-    "version": "1.2.0"
+    "description": "Research & Computational Drug Development multi-agent system with 23 scientific skills and 5 specialized agents",
+    "version": "1.3.0"
   },
   "plugins": [
     {
       "name": "scientific-skills",
-      "description": "Complete RCDD system with scientific skills, specialized agents, and orchestrator",
-      "version": "1.2.0",
+      "description": "Complete RCDD system with scientific skills and specialized agents",
+      "version": "1.3.0",
       "source": "./",
       "strict": false,
       "category": "scientific-research",
@@ -37,6 +37,7 @@
         "./scientific-skills/scientific-critical-thinking",
         "./scientific-skills/scientific-visualization",
         "./scientific-skills/scientific-writing",
+        "./scientific-skills/strategic-thinking",
         "./scientific-skills/string-database",
         "./scientific-skills/uniprot-database",
         "./scientific-skills/zinc-database"

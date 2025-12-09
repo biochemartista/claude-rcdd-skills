@@ -1,8 +1,12 @@
 # RCDD Skills: Workflows & Best Practices
 
+> **v1.3.0** - Updated for root-level coordination architecture
+
 ## Overview
 
 This guide provides practical workflows showing how skills combine for common drug discovery tasks. Each workflow includes decision points, skill sequences, and real examples.
+
+**Architecture Note:** Root Claude coordinates all agent chains via Task tool with file checkpoints. Agents execute tasks and write outputs to `.claude/outputs/` directories. For DEEP complexity, root Claude reads `strategic-thinking` skill first.
 
 ---
 
@@ -16,6 +20,7 @@ This guide provides practical workflows showing how skills combine for common dr
 | **Pathways** | reactome-database, reactome-database, string-database, opentargets-database | Biological context |
 | **Cheminformatics** | rdkit, medchem | Molecular analysis |
 | **Methodology** | scientific-writing, scientific-critical-thinking, scientific-brainstorming | Process & output |
+| **Cognitive** | strategic-thinking (root-only) | DEEP problem framing |
 
 ---
 
@@ -587,5 +592,21 @@ Before using any skill, agents MUST:
 | Literature review | perplexity (broad) | pubmed (specific) |
 | Pathway context | kegg + reactome + string | opentargets, literature |
 | Document writing | scientific-writing | validator |
+| Complex problem (DEEP) | **strategic-thinking** (root) | then agent chain |
 
 The key principle: **Match skill complexity to task complexity.** Not every question needs every database.
+
+---
+
+## DEEP Mode Protocol
+
+For wicked problems, multi-domain synthesis, or research program design:
+
+```
+1. Root Claude reads scientific-skills/strategic-thinking/SKILL.md
+2. Apply 5-phase protocol: Frame → Spark → Filter → Plan → Execute
+3. Route structured problem to appropriate agent chain
+4. Execute chain with file checkpoints
+```
+
+The `strategic-thinking` skill is ROOT-ONLY - it provides cognitive scaffolding, not execution.
