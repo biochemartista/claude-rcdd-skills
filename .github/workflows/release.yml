@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - '.claude-plugin/marketplace.json'
-      - 'plugin.json'
       - 'CLAUDE.md'
   workflow_dispatch:
 
@@ -27,27 +26,16 @@ jobs:
         run: |
           echo "Validating JSON files..."
           jq empty .claude-plugin/marketplace.json || exit 1
-          jq empty plugin.json || exit 1
           jq empty hooks.json || exit 1
           echo "✅ All JSON files valid"
 
-      - name: Extract and validate versions
+      - name: Extract version
         id: get_version
         run: |
-          MARKETPLACE_VER=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
-          PLUGIN_VER=$(jq -r '.version' plugin.json)
-
-          echo "marketplace.json version: $MARKETPLACE_VER"
-          echo "plugin.json version: $PLUGIN_VER"
-
-          if [ "$MARKETPLACE_VER" != "$PLUGIN_VER" ]; then
-            echo "::error::Version mismatch! marketplace.json=$MARKETPLACE_VER, plugin.json=$PLUGIN_VER"
-            exit 1
-          fi
-
-          echo "version=$MARKETPLACE_VER" >> $GITHUB_OUTPUT
-          echo "tag=v$MARKETPLACE_VER" >> $GITHUB_OUTPUT
-          echo "✅ Versions match: $MARKETPLACE_VER"
+          VERSION=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
       - name: Check if tag already exists
         id: check_tag
@@ -78,16 +66,14 @@ jobs:
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
           PREVIOUS_TAG="${{ steps.previous_tag.outputs.previous_tag }}"
-          SKILLS=$(jq '.skills.count' plugin.json)
-          AGENTS=$(jq '.agents.count' plugin.json)
 
           cat > release_notes.md << 'EOF'
           ## RCDD Multi-Agent System
 
+          **6 specialized agents | 22 scientific skills**
+
           EOF
 
-          echo "**${AGENTS} specialized agents | ${SKILLS} scientific skills**" >> release_notes.md
-          echo "" >> release_notes.md
           echo "### What's Changed" >> release_notes.md
           echo "" >> release_notes.md
 
@@ -129,7 +115,6 @@ jobs:
             .claude/ \
             .claude-plugin/ \
             CLAUDE.md \
-            plugin.json \
             hooks.json \
             hooks.ps1.json \
             WORKFLOWS_AND_BEST_PRACTICES.md \

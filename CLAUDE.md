@@ -174,7 +174,6 @@ When context window fills, preserve:
 | `.claude/skill-dependencies.md` | Skill loading order by task pattern |
 | `hooks.json` | Pre/post operation hooks for state tracking (bash/Linux) |
 | `hooks.ps1.json` | Pre/post operation hooks for state tracking (PowerShell/Windows) |
-| `plugin.json` | Plugin manifest and configuration |
 
 ---
 
