@@ -4,6 +4,7 @@
     "name": "biochemartista",
     "email": "antonio.lelas@gmail.com"
   },
+  "repository": "https://github.com/biochemartista/claude-rcdd-skills",
   "metadata": {
     "description": "Research & Computational Drug Development multi-agent system with 23 scientific skills and 5 specialized agents",
     "version": "1.3.0"
