@@ -33,38 +33,38 @@ Agents do NOT spawn other agents. All coordination happens at root level.
 mkdir -p .claude/outputs/$(date +%Y-%m-%d)-[task-slug]/{literature,medchem,targets,drafts,validation}
 ```
 
-| Agent | Output Directory | Required Files |
-|-------|------------------|----------------|
+| Agent                | Output Directory     | Required Files                  |
+| -------------------- | -------------------- | ------------------------------- |
 | @literature-reviewer | `{base}/literature/` | `references.md`, `synthesis.md` |
-| @medicinal-chemist | `{base}/medchem/` | `analysis.md`, `properties.md` |
-| @target-evaluator | `{base}/targets/` | `druggability.md` |
-| @scientific-writer | `{base}/drafts/` | `draft.md`, `figures/` (if any) |
-| @validator | `{base}/validation/` | `validation-report.md` |
+| @medicinal-chemist   | `{base}/medchem/`    | `analysis.md`, `properties.md`  |
+| @target-evaluator    | `{base}/targets/`    | `druggability.md`               |
+| @scientific-writer   | `{base}/drafts/`     | `draft.md`, `figures/` (if any) |
+| @validator           | `{base}/validation/` | `validation-report.md`          |
 
 ---
 
 ## Natural Language Triggers
 
-| User says... | Routes to |
-|--------------|-----------|
-| "What's known about X?" / "Find papers on..." / "Literature on..." | @literature-reviewer |
-| "Analyze this compound" / "Check druglikeness" / "SAR of..." | @medicinal-chemist |
-| "Is X a good target?" / "Druggability of..." / "Binding site..." | @target-evaluator |
-| "Write a report on..." / "Draft a summary of..." | Chain: @literature-reviewer → @scientific-writer → @validator |
-| "Check these citations" / "Verify PMIDs" | @validator |
-| "Deep dive into..." / "Comprehensive analysis of..." | DEEP mode (full chain) |
-| "Quick question about..." / "Simply tell me..." | DIRECT mode |
+| User says...                                                       | Routes to                                                     |
+| ------------------------------------------------------------------ | ------------------------------------------------------------- |
+| "What's known about X?" / "Find papers on..." / "Literature on..." | @literature-reviewer                                          |
+| "Analyze this compound" / "Check druglikeness" / "SAR of..."       | @medicinal-chemist                                            |
+| "Is X a good target?" / "Druggability of..." / "Binding site..."   | @target-evaluator                                             |
+| "Write a report on..." / "Draft a summary of..."                   | Chain: @literature-reviewer → @scientific-writer → @validator |
+| "Check these citations" / "Verify PMIDs"                           | @validator                                                    |
+| "Deep dive into..." / "Comprehensive analysis of..."               | DEEP mode (full chain)                                        |
+| "Quick question about..." / "Simply tell me..."                    | DIRECT mode                                                   |
 
 ---
 
 ## Complexity Classification
 
-| Mode | Criteria | Action |
-|------|----------|--------|
-| **DIRECT** | Simple factual, ≤600 words expected | Answer directly with skill lookups, no agents |
-| **QUICK** | Focused question, single agent sufficient | Spawn one agent, verify output |
-| **STANDARD** | Multi-agent with validation needed | Execute chain with checkpoints |
-| **DEEP** | Full pipeline, systematic investigation | Read `strategic-thinking` skill first, then full chain |
+| Mode         | Criteria                                  | Action                                                 |
+| ------------ | ----------------------------------------- | ------------------------------------------------------ |
+| **DIRECT**   | Simple factual, ≤600 words expected       | Answer directly with skill lookups, no agents          |
+| **QUICK**    | Focused question, single agent sufficient | Spawn one agent, verify output                         |
+| **STANDARD** | Multi-agent with validation needed        | Execute chain with checkpoints                         |
+| **DEEP**     | Full pipeline, systematic investigation   | Read `strategic-thinking` skill first, then full chain |
 
 ---
 
@@ -72,14 +72,15 @@ mkdir -p .claude/outputs/$(date +%Y-%m-%d)-[task-slug]/{literature,medchem,targe
 
 Skip agents entirely. Use skills directly:
 
-| Query Type | Skill to Use |
-|------------|--------------|
-| Latest research, current evidence | `pubmed-database` or web search |
-| Protein structure lookup | `pdb-database` |
-| Compound properties | `pubchem-database`, `chembl-database` |
-| Metabolite identification | `hmdb-database` |
+| Query Type                        | Skill to Use                          |
+| --------------------------------- | ------------------------------------- |
+| Latest research, current evidence | `pubmed-database` or web search       |
+| Protein structure lookup          | `pdb-database`                        |
+| Compound properties               | `pubchem-database`, `chembl-database` |
+| Metabolite identification         | `hmdb-database`                       |
 
 **Requirements:**
+
 - Verify ALL PMIDs/DOIs exist before responding
 - IEEE citation format: [1], [2], etc.
 - Output limit: ≤600 words
@@ -126,6 +127,7 @@ head -50 "$TASK_DIR/[agent-folder]/[expected-file].md"
 ```
 
 **If checkpoint fails:**
+
 - Re-spawn same agent with clarified instructions
 - Or: Ask user how to proceed
 
@@ -151,47 +153,52 @@ OUTPUT REQUIREMENTS:
 ## Mandatory Agent Chains
 
 ### Chain A: Document with References
+
 ```
 @literature-reviewer → CHECKPOINT → @scientific-writer → CHECKPOINT → @validator
 ```
 
-| Step | Agent | Input | Output | Checkpoint |
-|------|-------|-------|--------|------------|
-| 1 | @literature-reviewer | Query | `literature/references.md`, `literature/synthesis.md` | Verify both files exist, references.md has PMIDs |
-| 2 | @scientific-writer | Files from step 1 | `drafts/draft.md` | Verify draft exists, contains citations |
-| 3 | @validator | Draft + references | `validation/validation-report.md` | Verify report has APPROVED/REJECTED verdict |
+| Step | Agent                | Input              | Output                                                | Checkpoint                                       |
+| ---- | -------------------- | ------------------ | ----------------------------------------------------- | ------------------------------------------------ |
+| 1    | @literature-reviewer | Query              | `literature/references.md`, `literature/synthesis.md` | Verify both files exist, references.md has PMIDs |
+| 2    | @scientific-writer   | Files from step 1  | `drafts/draft.md`                                     | Verify draft exists, contains citations          |
+| 3    | @validator           | Draft + references | `validation/validation-report.md`                     | Verify report has APPROVED/REJECTED verdict      |
 
 ### Chain B: Drug Candidate Evaluation
+
 ```
 @literature-reviewer → CHECKPOINT → @medicinal-chemist
 ```
 
-| Step | Agent | Input | Output | Checkpoint |
-|------|-------|-------|--------|------------|
-| 1 | @literature-reviewer | Compound query | `literature/references.md`, `literature/synthesis.md` | Verify files exist |
-| 2 | @medicinal-chemist | Files + compound ID | `medchem/analysis.md`, `medchem/properties.md` | Verify SAR/ADMET data present |
+| Step | Agent                | Input               | Output                                                | Checkpoint                    |
+| ---- | -------------------- | ------------------- | ----------------------------------------------------- | ----------------------------- |
+| 1    | @literature-reviewer | Compound query      | `literature/references.md`, `literature/synthesis.md` | Verify files exist            |
+| 2    | @medicinal-chemist   | Files + compound ID | `medchem/analysis.md`, `medchem/properties.md`        | Verify SAR/ADMET data present |
 
 ### Chain C: Natural Product Assessment
+
 ```
 @literature-reviewer (NATURAL_COMPOUND) → CHECKPOINT → @medicinal-chemist (HMDB)
 ```
 
-| Step | Agent | Input | Output | Checkpoint |
-|------|-------|-------|--------|------------|
-| 1 | @literature-reviewer | Query + "Assessment: NATURAL_COMPOUND" | `literature/references.md`, `literature/synthesis.md` | Verify adjusted evidence criteria applied |
-| 2 | @medicinal-chemist | Files + "Include HMDB metabolite check" | `medchem/analysis.md`, `medchem/metabolites.md` | Verify HMDB data included |
+| Step | Agent                | Input                                   | Output                                                | Checkpoint                                |
+| ---- | -------------------- | --------------------------------------- | ----------------------------------------------------- | ----------------------------------------- |
+| 1    | @literature-reviewer | Query + "Assessment: NATURAL_COMPOUND"  | `literature/references.md`, `literature/synthesis.md` | Verify adjusted evidence criteria applied |
+| 2    | @medicinal-chemist   | Files + "Include HMDB metabolite check" | `medchem/analysis.md`, `medchem/metabolites.md`       | Verify HMDB data included                 |
 
 ### Chain D: Target Validation
+
 ```
 @target-evaluator → CHECKPOINT → @literature-reviewer
 ```
 
-| Step | Agent | Input | Output | Checkpoint |
-|------|-------|-------|--------|------------|
-| 1 | @target-evaluator | Target query | `targets/druggability.md` | Verify verdict (PROCEED/CAUTION/DEPRIORITIZE) present |
-| 2 | @literature-reviewer | Druggability findings | `literature/references.md` | Verify supporting evidence gathered |
+| Step | Agent                | Input                 | Output                     | Checkpoint                                            |
+| ---- | -------------------- | --------------------- | -------------------------- | ----------------------------------------------------- |
+| 1    | @target-evaluator    | Target query          | `targets/druggability.md`  | Verify verdict (PROCEED/CAUTION/DEPRIORITIZE) present |
+| 2    | @literature-reviewer | Druggability findings | `literature/references.md` | Verify supporting evidence gathered                   |
 
 ### Chain E: Comprehensive Discovery (DEEP)
+
 ```
 @literature-reviewer → @target-evaluator → @medicinal-chemist → @scientific-writer → @validator
 ```
@@ -205,6 +212,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ### @literature-reviewer MUST produce:
 
 **File: `references.md`**
+
 ```markdown
 # Reference Table
 
@@ -214,6 +222,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ```
 
 **File: `synthesis.md`**
+
 ```markdown
 # Literature Synthesis: [Topic]
 
@@ -230,6 +239,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ### @medicinal-chemist MUST produce:
 
 **File: `analysis.md`**
+
 ```markdown
 # Medicinal Chemistry Analysis: [Compound]
 
@@ -251,6 +261,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ### @target-evaluator MUST produce:
 
 **File: `druggability.md`**
+
 ```markdown
 # Target Evaluation: [Target Name]
 
@@ -275,6 +286,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ### @scientific-writer MUST produce:
 
 **File: `draft.md`**
+
 ```markdown
 # [Document Title]
 
@@ -287,6 +299,7 @@ Execute with checkpoint after EACH step. For DEEP mode, also read `scientific-sk
 ### @validator MUST produce:
 
 **File: `validation-report.md`**
+
 ```markdown
 # Citation Validation Report
 
@@ -325,13 +338,13 @@ If @validator returns REJECTED:
 
 ## Agent-Skill Assignments
 
-| Agent | Skills |
-|-------|--------|
-| @literature-reviewer | `perplexity-search`, `pubmed-database`, `literature-review`, `scientific-critical-thinking`, `scientific-brainstorming` |
-| @medicinal-chemist | `medchem`, `chembl-database`, `drugbank-database`, `hmdb-database`, `rdkit`, `pubchem-database`, `zinc-database`, `reactome-database`, `string-database` |
-| @target-evaluator | `opentargets-database`, `pdb-database`, `uniprot-database`, `string-database`, `biopython` |
-| @scientific-writer | `scientific-writing`, `scientific-visualization`, `matplotlib` |
-| @validator | `pubmed-database` |
+| Agent                | Skills                                                                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @literature-reviewer | `perplexity-search`, `pubmed-database`, `literature-review`, `scientific-critical-thinking`, `scientific-brainstorming`                                  |
+| @medicinal-chemist   | `medchem`, `chembl-database`, `drugbank-database`, `hmdb-database`, `rdkit`, `pubchem-database`, `zinc-database`, `reactome-database`, `string-database` |
+| @target-evaluator    | `opentargets-database`, `pdb-database`, `uniprot-database`, `string-database`, `biopython`                                                               |
+| @scientific-writer   | `scientific-writing`, `scientific-visualization`, `matplotlib`                                                                                           |
+| @validator           | `pubmed-database`                                                                                                                                        |
 
 **For DEEP complexity:** Read `scientific-skills/strategic-thinking/SKILL.md` before planning chain.
 
@@ -355,21 +368,25 @@ When query involves natural products, phytochemicals, or nutraceuticals:
 When resuming or context fills, preserve:
 
 1. **Task State**
+   
    - Current workspace: `.claude/outputs/[date]-[task]/`
    - Chain position: "Completed @literature-reviewer, at @medicinal-chemist"
    - Files created so far
 
 2. **Research Identifiers**
+   
    - Compound: ChEMBL ID, SMILES
    - Target: UniProt, Gene symbol
    - Structure: PDB codes
    - Key PMIDs collected
 
 3. **Pending Work**
+   
    - Next agent in chain
    - Outstanding validation issues
 
 **Resume pattern:**
+
 ```
 "Continue [task] in .claude/outputs/[date]-[slug]/
 Completed: @literature-reviewer (files in literature/)
@@ -438,28 +455,31 @@ QUERY RECEIVED
 
 ## Key Files Reference
 
-| File | Purpose |
-|------|---------|
-| `agents/[name].md` | Agent personas and capabilities |
+| File                                            | Purpose                                |
+| ----------------------------------------------- | -------------------------------------- |
+| `agents/[name].md`                              | Agent personas and capabilities        |
 | `scientific-skills/strategic-thinking/SKILL.md` | Cognitive frameworks for DEEP problems |
-| `scientific-skills/[name]/SKILL.md` | Individual skill instructions |
-| `.claude/schemas/` | Inter-agent data format specifications |
-| `WORKFLOWS_AND_BEST_PRACTICES.md` | Additional workflow patterns |
+| `scientific-skills/[name]/SKILL.md`             | Individual skill instructions          |
+| `.claude/schemas/`                              | Inter-agent data format specifications |
+| `WORKFLOWS_AND_BEST_PRACTICES.md`               | Additional workflow patterns           |
 
 ---
 
 ## Troubleshooting
 
 **Agent produced no files:**
+
 - Re-spawn with explicit "You MUST save output to [path]"
 - Check agent has Write tool access
 
 **Checkpoint shows empty file:**
+
 - Agent may have encountered error
 - Check agent response for issues
 - Re-spawn with simpler scope
 
 **Validator keeps rejecting:**
+
 - After 3 cycles, deliver with disclaimer
 - Note which citations couldn't be verified
 - User decides whether to proceed
