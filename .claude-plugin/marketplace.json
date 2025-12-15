@@ -1,8 +1,7 @@
 {
   "name": "claude-rcdd-skills",
   "owner": {
-    "name": "biochemartista",
-    "email": "antonio.lelas@gmail.com"
+    "name": "biochemartista"
   },
   "repository": "https://github.com/biochemartista/claude-rcdd-skills",
   "metadata": {
@@ -18,13 +17,6 @@
       "strict": false,
       "category": "scientific-research",
       "keywords": ["drug-discovery", "computational-chemistry", "bioinformatics", "research", "multi-agent", "medicinal-chemistry", "natural-products"],
-      "agents": [
-        "./agents/literature-reviewer",
-        "./agents/medicinal-chemist",
-        "./agents/scientific-writer",
-        "./agents/target-evaluator",
-        "./agents/validator"
-      ],
       "skills": [
         "./scientific-skills/biopython",
         "./scientific-skills/chembl-database",
