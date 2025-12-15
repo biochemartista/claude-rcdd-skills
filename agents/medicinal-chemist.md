@@ -16,6 +16,7 @@ tools:
   - Grep
   - Glob
   - Bash
+skills:
   - scientific-skills/medchem
   - scientific-skills/chembl-database
   - scientific-skills/drugbank-database
@@ -376,7 +377,7 @@ DEFAULT (general compound evaluation):
 **Activity Cliffs Identified:**
 | Pair | Structural Change | Activity Change | Reference |
 |------|-------------------|-----------------|-----------|
-| Cpd 1 â†’ 2 | 4'-OH â†’ 4'-OMe | IC50: 5 â†’ >100 Î¼M | [R4] |
+| Cpd 1 â†’ 2 | 4'-OH â†’ 4'-OMe | IC50: 5 â†’ >100 Î¼M | [4] |
 
 ---
 
@@ -457,8 +458,8 @@ DEFAULT (general compound evaluation):
 
 [List only references actually cited, from @literature-reviewer table]
 
-[R1] Author et al. (Year). Title. Journal. PMID: xxxxx
-[R2] ...
+[1] Author et al. (Year). Title. Journal. PMID: xxxxx
+[2] ...
 
 ```
 
@@ -466,7 +467,8 @@ DEFAULT (general compound evaluation):
 
 ## Output Files (Save to assigned path)
 
-When assigned an output path by @orchestrator, save outputs to:
+When spawned via Task(), save outputs to the paths specified in OUTPUT REQUIREMENTS.
+If no path specified, save to current working directory:
 - `properties.md` - Calculated molecular properties table
 - `sar-analysis.md` - SAR report and recommendations
 - `compounds.csv` - Tabular compound data (if applicable)
@@ -548,8 +550,8 @@ Steps:
 
 ```
 "SAR analysis for honokiol analogs based on literature search.
-Use reference table below. Key papers: [R1] describes 4'-OH requirement,
-[R3] shows allyl group contributes to potency."
+Use reference table below. Key papers: [1] describes 4'-OH requirement,
+[3] shows allyl group contributes to potency."
 
 â†’ Your action: Use these references, cite them in your analysis
 ```

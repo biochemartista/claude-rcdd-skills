@@ -15,6 +15,7 @@ tools:
   - WebFetch
   - Grep
   - Bash
+skills:
   - scientific-skills/perplexity-search
   - scientific-skills/pubmed-database
   - scientific-skills/literature-review
@@ -316,11 +317,11 @@ Always output in this exact structure for downstream agents:
 ### Key Findings
 
 1. **[Finding category/theme]**
-   - [Specific finding with citation] [R1] *[Evidence: HIGH/MOD/LOW]*
-   - [Related finding] [R2, R3] *[Evidence: MODERATE]*
+   - [Specific finding with citation] [1] *[Evidence: HIGH/MOD/LOW]*
+   - [Related finding] [2, 3] *[Evidence: MODERATE]*
 
 2. **[Next category]**
-   - [Finding] [R4] *[Evidence: LOW - single study]*
+   - [Finding] [4] *[Evidence: LOW - single study]*
    ...
 
 ### Mechanisms / Pathways (if applicable)
@@ -330,7 +331,7 @@ Always output in this exact structure for downstream agents:
 ### Quantitative Data (if applicable)
 | Parameter | Value | Model/System | Reference | Evidence |
 |-----------|-------|--------------|-----------|----------|
-| IC50 | 15 Î¼M | LNCaP cells | R3 | MODERATE |
+| IC50 | 15 Î¼M | LNCaP cells | 3 | MODERATE |
 | ... | ... | ... | ... | ... |
 
 ### Evidence Quality Summary
@@ -371,11 +372,11 @@ Always output in this exact structure for downstream agents:
 
 ## FULL CITATIONS (Formatted)
 
-[R1] Smith AB, Jones CD, Williams EF. (2024). Full title of the paper here. Journal of Medicinal Chemistry, 67(4), 1234-1245. PMID: 12345678. DOI: 10.1021/acs.jmedchem.xxx
+[1] Smith AB, Jones CD, Williams EF. (2024). Full title of the paper here. Journal of Medicinal Chemistry, 67(4), 1234-1245. PMID: 12345678. DOI: 10.1021/acs.jmedchem.xxx
 
-[R2] Jones CD, Brown GH. (2023). Another paper title. Cancer Research, 83(12), 2345-2356. PMID: 23456789. DOI: 10.1158/0008-5472.xxx
+[2] Jones CD, Brown GH. (2023). Another paper title. Cancer Research, 83(12), 2345-2356. PMID: 23456789. DOI: 10.1158/0008-5472.xxx
 
-[R3] ...
+[3] ...
 
 ---
 
@@ -440,7 +441,8 @@ For drug discovery literature, prioritize by study type:
 
 ## Output Files (Save to assigned path)
 
-When assigned an output path by @orchestrator, save outputs to:
+When spawned via Task(), save outputs to the paths specified in OUTPUT REQUIREMENTS.
+If no path specified, save to current working directory:
 
 - `references.md` - Reference table with PMIDs, authors, titles, evidence ratings
 - `synthesis.md` - Literature synthesis narrative

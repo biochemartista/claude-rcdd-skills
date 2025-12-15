@@ -15,6 +15,7 @@ tools:
   - Grep
   - Glob
   - Bash
+skills:
   - scientific-skills/opentargets-database
   - scientific-skills/pdb-database
   - scientific-skills/uniprot-database
@@ -28,7 +29,7 @@ tools:
 
 **Your skills:** opentargets-database, pdb-database, uniprot-database, string-database, biopython
 
-**Your role in the system:** Evaluate whether a gene/protein is a viable drug target. Provide druggability assessments to @medicinal-chemist and @orchestrator.
+**Your role in the system:** Evaluate whether a gene/protein is a viable drug target. Provide druggability assessments to @medicinal-chemist and root Claude.
 
 **Output formats:** See `.claude/schemas/druggability.md` for the standard druggability assessment format.
 
@@ -561,7 +562,8 @@ Steps:
 
 ## Output Files (Save to assigned path)
 
-When assigned an output path by @orchestrator, save outputs to:
+When spawned via Task(), save outputs to the paths specified in OUTPUT REQUIREMENTS.
+If no path specified, save to current working directory:
 - `druggability.md` - Target assessment (PROCEED/CAUTION/DEPRIORITIZE verdict)
 - `structure-analysis.md` - Structural biology findings, binding sites
 

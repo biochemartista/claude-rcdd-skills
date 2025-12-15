@@ -14,6 +14,7 @@ tools:
   - Grep
   - Glob
   - Bash
+skills:
   - scientific-skills/scientific-writing
   - scientific-skills/scientific-visualization
   - scientific-skills/matplotlib
@@ -111,17 +112,17 @@ The main agent will:
 **In-text citations:**
 
 - Use `[R#]` format matching reference table IDs
-- Multiple citations: `[R1, R3, R7]`
-- For direct quotes (rare): `[R1, p. 234]`
+- Multiple citations: `[1, 3, 7]`
+- For direct quotes (rare): `[1, p. 234]`
 
 **Every claim type needs citation:**
 | Claim Type | Citation Required | Example |
 |------------|-------------------|---------|
-| Quantitative data | YES | "IC50 of 15 Î¼M [R3]" |
-| Mechanism statements | YES | "inhibits AR signaling [R1, R5]" |
-| Comparison to literature | YES | "consistent with prior work [R2]" |
-| General background | YES (usually) | "X is a validated target [R4]" |
-| Methodology description | IF from literature | "as previously described [R6]" |
+| Quantitative data | YES | "IC50 of 15 Î¼M [3]" |
+| Mechanism statements | YES | "inhibits AR signaling [1, 5]" |
+| Comparison to literature | YES | "consistent with prior work [2]" |
+| General background | YES (usually) | "X is a validated target [4]" |
+| Methodology description | IF from literature | "as previously described [6]" |
 | Your own analysis | NO | "Based on these data, we conclude..." |
 
 ---
@@ -323,7 +324,7 @@ Note: The body of your documents should favor cohesive narrative prose. Use tabl
 
 ## 4. Discussion
 [Interpret findings through connected argumentation]
-[Compare with prior work naturally: "These results align with earlier observations [R2, R5], though the mechanism differs..."]
+[Compare with prior work naturally: "These results align with earlier observations [2, 5], though the mechanism differs..."]
 [Acknowledge limitations as part of the narrative]
 
 ## 5. Conclusions / Recommendations
@@ -338,8 +339,8 @@ Note: The body of your documents should favor cohesive narrative prose. Use tabl
 
 | ID | Citation | Used In |
 |----|----------|---------|
-| R1 | Smith et al. (2024). Title. J Med Chem. PMID: 12345678 | Intro, Discussion |
-| R3 | Jones et al. (2023). Title. Cancer Res. PMID: 23456789 | Results |
+| 1 | Smith et al. (2024). Title. J Med Chem. PMID: 12345678 | Intro, Discussion |
+| 3 | Jones et al. (2023). Title. Cancer Res. PMID: 23456789 | Results |
 
 ---
 
@@ -408,7 +409,8 @@ Action: [REMOVE | REFORMULATE | SOFTEN]
 
 ## Output Files (Save to assigned path)
 
-When assigned an output path by @orchestrator, save outputs to:
+When spawned via Task(), save outputs to the paths specified in OUTPUT REQUIREMENTS.
+If no path specified, save to current working directory:
 
 - `draft-v1.md` (increment version for revisions: v2, v3)
 - `figures/*.png` - Generated matplotlib figures

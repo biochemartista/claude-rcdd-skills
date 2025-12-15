@@ -13,6 +13,7 @@ tools:
   - WebFetch
   - Grep
   - Bash
+skills:
   - scientific-skills/pubmed-database
 ---
 
@@ -141,9 +142,9 @@ Missing (cited, not in list): None
 Verify each citation ID exists in the reference table from @literature-reviewer:
 
 ```
-âœ… R1 - Found in table (PMID: 12345678)
-âœ… R2 - Found in table (PMID: 23456789)
-âŒ R8 - NOT IN PROVIDED TABLE (CRITICAL ERROR)
+âœ… 1 - Found in table (PMID: 12345678)
+âœ… 2 - Found in table (PMID: 23456789)
+âŒ 8 - NOT IN PROVIDED TABLE (CRITICAL ERROR)
 ```
 
 ### Step 3: Verify PMIDs/DOIs are Real
@@ -190,7 +191,7 @@ Validating 5 (DOI: 10.1038/xxx):
 For each major claim + citation pair, verify the citation actually supports the claim:
 
 ```
-CLAIM: "Honokiol inhibits AR signaling at 10-20 Î¼M [R3]"
+CLAIM: "Honokiol inhibits AR signaling at 10-20 Î¼M [3]"
 
 Validation process:
 â†’ Retrieve 3 abstract/details from PubMed
@@ -273,8 +274,8 @@ Issues:
 
 **[7] - Claim-Citation Mismatch**
 - **Location in document:** Results, paragraph 2
-- **Claim made:** "Honokiol crosses the blood-brain barrier efficiently [R7]"
-- **What R7 actually says:** Study examined magnolol (not honokiol) BBB penetration
+- **Claim made:** "Honokiol crosses the blood-brain barrier efficiently [7]"
+- **What 7 actually says:** Study examined magnolol (not honokiol) BBB penetration
 - **Issue type:** Wrong compound cited
 - **Severity:** HIGH
 - **Verification query:** "honokiol blood-brain barrier penetration pharmacokinetics"
@@ -314,7 +315,7 @@ Issues:
 
 | ID | Status | Recommendation |
 |----|--------|----------------|
-| R4 | In list, never cited | Remove from reference list OR add citation in text |
+| 4 | In list, never cited | Remove from reference list OR add citation in text |
 
 ---
 
@@ -323,7 +324,7 @@ Issues:
 | Check | Status | Notes |
 |-------|--------|-------|
 | Consistent citation style | âœ… | All [R#] format |
-| All refs have PMID or DOI | âš ï¸ | R9 missing identifier |
+| All refs have PMID or DOI | âš ï¸ | 9 missing identifier |
 | Year format consistent | âœ… | All (YYYY) format |
 | Author format consistent | âš ï¸ | Mix of "et al." styles |
 | Journal names consistent | âœ… | Full names used |
@@ -345,7 +346,7 @@ Issues:
 | # | Issue | Fix |
 |---|-------|-----|
 | 1 | 9 missing PMID | Locate and add from PubMed |
-| 2 | Orphan reference R4 | Remove from list or add citation |
+| 2 | Orphan reference 4 | Remove from list or add citation |
 | 3 | Author format inconsistency | Standardize to "First AB et al." |
 
 ---
@@ -412,7 +413,8 @@ If REJECTED:
 
 ## Output Files (Save to assigned path)
 
-When assigned an output path by @orchestrator, save outputs to:
+When spawned via Task(), save outputs to the paths specified in OUTPUT REQUIREMENTS.
+If no path specified, save to current working directory:
 
 - `validation-report.md` - Full validation report with APPROVED/REJECTED verdict
 
