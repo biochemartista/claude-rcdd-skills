@@ -195,7 +195,7 @@ result = search_with_perplexity(
     query="What are the latest CRISPR developments?",
     query="What are the latest CRISPR developments?",
     model="openrouter/perplexity/sonar-pro-search",
-    max_tokens=12000,
+    max_tokens=24000,
     temperature=0.2,
     verbose=False
 )
@@ -425,7 +425,7 @@ Required:
 
 Optional:
 - `DEFAULT_MODEL`: Default model to use (default: sonar-pro-search)
-- `DEFAULT_MAX_TOKENS`: Default max tokens (default: 12000)
+- `DEFAULT_MAX_TOKENS`: Default max tokens (default: 24000)
 - `DEFAULT_TEMPERATURE`: Default temperature (default: 0.2)
 
 ## Summary

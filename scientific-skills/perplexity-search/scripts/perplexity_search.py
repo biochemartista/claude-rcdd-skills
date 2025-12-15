@@ -52,7 +52,7 @@ def check_api_key() -> Optional[str]:
 def search_with_perplexity(
     query: str,
     model: str = "openrouter/perplexity/sonar-pro-search",
-    max_tokens: int = 12000,
+    max_tokens: int = 24000,
     temperature: float = 0.2,
     verbose: bool = False
 ) -> Dict[str, Any]:
@@ -184,8 +184,8 @@ Available Models:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=12000,
-        help="Maximum tokens in response (default: 12000)"
+        default=24000,
+        help="Maximum tokens in response (default: 24000)"
     )
 
     parser.add_argument(
